@@ -1,5 +1,9 @@
 Change log:
 
+Version 0.0.2, Nov 20, 2015
+----------------------------
+Added the functionality to compute recency and duration of Date variables by an ID
+
 Version 0.0.1, Sep 30, 2015
 ----------------------------
 Submitted package to cran with one function: Aggregate

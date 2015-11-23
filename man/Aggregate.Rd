@@ -2,14 +2,18 @@
 % Please edit documentation in R/Aggregate.R
 \name{Aggregate}
 \alias{Aggregate}
-\title{Aggregate numeric and categorical variables by an ID}
+\title{Aggregate numeric,Date and categorical variables by an ID}
 \usage{
-Aggregate(x, by, ...)
+Aggregate(x, by, end_ind = Sys.Date(), format = "\%Y-\%m-\%d", ...)
 }
 \arguments{
 \item{x}{A data frame without the ID. Categorical variables have to be of type character or factor and continuous variables have to be of type integer or numeric.}
 
 \item{by}{A vector containing IDs.}
+
+\item{end_ind}{A Date object, or something which can be coerced by \code{as.Date(origin, ...)} to such an object. If not specified,  we take the \code{Sys.Date()} as end date.}
+
+\item{format}{A character string. If not specified, the ISO 8601 international standard which expresses a day "\%Y-\%m-\%d" is taken.}
 
 \item{...}{Extra parameters to be passed to the \code{dummy} function in the \code{dummy} package.}
 }
@@ -17,13 +21,15 @@ Aggregate(x, by, ...)
 A data frame with the aforementioned variables aggregated by the given ID variables
 }
 \description{
-The \code{Aggregate} function (not to be confounded with aggregate) prepares a data frame for merging by computing the sum, mean and variance of all continuous (integer and numeric) variables by a given ID variable. It also creates dummies for all categorical variables (character and factor) and subsequently computes the sum by a given ID variable. This functions aims at maximum information extraction with a minimum amount of code.
+The \code{Aggregate} function (not to be confounded with aggregate) prepares a data frame for merging by computing the sum, mean and variance of all continuous (integer and numeric) variables by a given ID variable. For all categorical variabes (character and factor), it creates dummies and subsequently computes the sum by a given ID variable. For all Date variables, it computes recency and duration by a given ID and end date variable. This functions aims at maximum information extraction with a minimum amount of code.
 }
 \examples{
 # Example
 # Create some data
 data <- data.frame(V1=as.factor(c('yes','no','no','yes','yes','yes','yes')),
-                   V2=as.character(c(1,2,3,4,4,4,4)),V3=c(1:7),V4=as.numeric(c(7:1)))
+                   V2=as.character(c(1,2,3,4,4,4,4)),V3=c(1:7),V4=as.numeric(c(7:1)),
+                   V5 = as.Date(as.Date('2014-12-03'):as.Date('2014-12-09'), origin = "1970-01-01")
+                   )
 ID=as.character(c(1,1,1,1,2,2,2))
 Aggregate(x=data,by=ID)
 
