@@ -1,8 +1,8 @@
 Package: AggregateR
 Type: Package
 Title: Aggregate Numeric, Date and Categorical Variables
-Version: 0.1.0
-Date: 2020-11-17
+Version: 0.1.1
+Date: 2020-11-18
 Imports: stats, utils, methods, data.table, tibble, NCmisc
 Author: Matthias Bogaert, Michel Ballings, Dirk Van den Poel
 Maintainer: Matthias Bogaert <matthias.bogaert@ugent.be>
@@ -15,6 +15,6 @@ LazyData: TRUE
 RoxygenNote: 7.1.1
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2020-11-18 08:54:52 UTC; matbogae
+Packaged: 2020-11-19 08:53:39 UTC; matbogae
 Repository: CRAN
-Date/Publication: 2020-11-18 19:00:02 UTC
+Date/Publication: 2020-11-20 10:30:26 UTC

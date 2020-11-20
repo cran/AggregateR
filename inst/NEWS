@@ -1,10 +1,15 @@
 Change log:
 
+Version 0.1.1, Nov 18, 2020
+----------------------------
+Bug fix such that Aggregate works when the table only contains numerics or dates. 
+Bug fix with the 'by' parameter.
+
 Version 0.1.0, Nov 17, 2020
 ----------------------------
 Re-written the code in data.table for computational speed. 
 Added efficient dummy-coding also written in data.table.
-Allowed the fucntionality to output a tibble. 
+Allowed the functionality to output a tibble. 
 
 Version 0.0.2, Nov 20, 2015
 ----------------------------

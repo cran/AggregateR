@@ -3,7 +3,7 @@
 #' The \code{Aggregate} function (not to be confounded with aggregate) prepares a data frame or data table for merging by computing the sum, mean and variance of all continuous (integer and numeric) variables by a given variable. For all categorical variabes (character and factor), it creates dummies and subsequently computes the sum and the mode by a given variable. For all Date variables, it computes the recency and duration by a given variable with repsect the an end date variable. For computational speed, all the calculations are done with \code{data.table}. This functions aims at maximum information extraction with a minimum amount of code.
 #'
 #' @param x A data frame or data table. Categorical variables have to be of type character or factor and continuous variables have to be of type integer or numeric. Date variables should be in the Date format.
-#' @param by A character string specifying the variable on which to aggregate the results.
+#' @param by A character string specifying the variable on which to aggregate the results. Note that 'by' should be a variable of the table 'x'.
 #' @param end_ind A Date object, or something which can be coerced by \code{as.Date(origin, ...)} to such an object. If not specified,  we take the \code{Sys.Date()} as end date.
 #' @param format A character string. If not specified, the ISO 8601 international standard which expresses a day "\%Y-\%m-\%d" is taken.
 #' @param tibble Should the output be a tibble, data frame or data table? By default, the function returns a data frame or data table depending on the input. To return a tibble, the user must set the tibble = TRUE.
@@ -24,8 +24,7 @@
 #'                   V5 = sample(as.Date(as.Date('2014-12-09'):Sys.Date()-1,
 #'                   origin = "1970-01-01"),200000,TRUE),
 #'                   ID=sample(x = as.character(1:4), size = 200000, replace = TRUE))
-#' ID <- as.character(c(1,1,1,1,2,2,2))
-
+#'
 #' Aggregate(x=data,by='ID')
 #'
 #' # Examples of how to use the object and p argument. See dummy and categories function for details.
@@ -74,58 +73,61 @@ Aggregate <- function (x, by, end_ind = Sys.Date(), format = '%Y-%m-%d', tibble 
       dummies_df <- dummies_df[,as.list(unlist(lapply(.SD, function(x) list(sum=sum(x),
                                                                               mode=Mode(x))))),
                                  by=eval(by)]###NEW
+      names(dummies_df) <- gsub('[.]','_',names(dummies_df))
     }
-    names(dummies_df) <- gsub('[.]','_',names(dummies_df))
 
 
-    numerics <- sapply(x, is.numeric) | sapply (x, is.integer) | colnames(x) == by
+
+    numerics <- sapply(x, is.numeric) | sapply (x, is.integer)
     if (any(numerics==TRUE)) {
       if(verbose == TRUE) cat('Calculating numerical variables ... \n')
+      numerics <- numerics | colnames(x) == by
       numerics_df <- x[, numerics, with = FALSE]
       numerics_df <- numerics_df[,as.list(unlist(lapply(.SD, function(x) list(sum=sum(x),
                                                                                 mean=mean(x),
                                                                                 var=var(x))))),
                                    by=eval(by)]
+      names(numerics_df) <- gsub('[.]','_',names(numerics_df))
 
     }
-    names(numerics_df) <- gsub('[.]','_',names(numerics_df))
 
-    dates <- sapply(x,function(z) is(z,"Date")) | colnames(x) == by
+    dates <- sapply(x,function(z) is(z,"Date"))
     if(any(dates == TRUE)) {
       if(verbose == TRUE) cat('Calculating date variables ... \n')
       end_ind <- as.Date(end_ind, format = format)
+      dates <- dates | colnames(x) == by
       dates_df <- x[,dates, with = FALSE]
       dates_df <- dates_df[, as.list(unlist(lapply(.SD, function (x) list(duration = end_ind - min(x),
                                                                             recency = end_ind - max(x) )))),
                              by = eval(by)]
+      names(dates_df) <- gsub('[.]','_',names(dates_df))
     }
-    names(dates_df) <- gsub('[.]','_',names(dates_df))
 
-    mergelist <- list(dummies_df, numerics_df, dates_df)
 
     if (any(dates == TRUE) && any(categoricals == TRUE) && any(numerics == TRUE)) {
-      final <- Reduce(function(x,y) merge(x,y, by = 'ID'), mergelist)
+      mergelist <- list(dummies_df, numerics_df, dates_df)
+      final <- Reduce(function(x,y) merge(x,y, by = by), mergelist)
       if (cl == 'data.frame') final <- data.frame(final)
       else final <- data.table (final)
     } else if (any(categoricals == TRUE) && any(numerics == TRUE)) {
-      final <- merge(dummies_df, numerics_df, by = 'ID')
+      final <- merge(dummies_df, numerics_df, by = by)
       if (cl == 'data.frame') final <- data.frame(final)
       else final <- data.table (final)
     } else if (any(categoricals == TRUE) && any(dates == TRUE)) {
-      final <- merge(dummies_df, dates_df, by = 'ID')
+      final <- merge(dummies_df, dates_df, by = by)
       if (cl == 'data.frame') final <- data.frame(final)
       else final <- data.table (final)
     } else if (any(dates == TRUE) && any(numerics == TRUE)) {
-      final <- merge(numerics_df, dates_df, by = 'ID')
+      final <- merge(numerics_df, dates_df, by = by)
       if (cl == 'data.frame') final <- data.frame(final)
       else final <- data.table (final)
     } else if (any(categoricals == TRUE)) {
       if (cl == 'data.frame') final <- data.frame(dummies_df)
       else final <- data.table (dummies_df)
-    } else if (any(numerics_df == TRUE)) {
+    } else if (any(numerics == TRUE)) {
       if (cl == 'data.frame') final <- data.frame(numerics_df)
       else final <- data.table (numerics_df)
-    } else if (any(dates_df == TRUE)) {
+    } else if (any(dates == TRUE)) {
       if (cl == 'data.frame') final <- data.frame(dates_df)
       else final <- data.table (dates_df)
     }

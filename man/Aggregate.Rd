@@ -18,7 +18,7 @@ Aggregate(
 \arguments{
 \item{x}{A data frame or data table. Categorical variables have to be of type character or factor and continuous variables have to be of type integer or numeric. Date variables should be in the Date format.}
 
-\item{by}{A character string specifying the variable on which to aggregate the results.}
+\item{by}{A character string specifying the variable on which to aggregate the results. Note that 'by' should be a variable of the table 'x'.}
 
 \item{end_ind}{A Date object, or something which can be coerced by \code{as.Date(origin, ...)} to such an object. If not specified,  we take the \code{Sys.Date()} as end date.}
 
@@ -48,7 +48,7 @@ data <- data.frame(V1=sample(as.factor(c('yes','no')), 200000, TRUE),
                   V5 = sample(as.Date(as.Date('2014-12-09'):Sys.Date()-1,
                   origin = "1970-01-01"),200000,TRUE),
                   ID=sample(x = as.character(1:4), size = 200000, replace = TRUE))
-ID <- as.character(c(1,1,1,1,2,2,2))
+
 Aggregate(x=data,by='ID')
 
 # Examples of how to use the object and p argument. See dummy and categories function for details.
